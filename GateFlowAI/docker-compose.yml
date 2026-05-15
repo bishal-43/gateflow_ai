@@ -1,0 +1,35 @@
+services:
+
+  frontend:
+    build: ./gateflow-ai-Frontend
+    ports:
+      - "3000:3000"
+
+  backend:
+    build: ./gateflow-backend
+    ports:
+      - "8000:8000"
+    
+    env_file:
+    - ./gateflow-backend/.env
+
+    depends_on:
+      - rag
+
+  rag:
+    build: ./GateFlow-rag
+    ports:
+      - "8001:8001"
+    
+    env_file:
+    - ./GateFlow-rag/.env
+
+  redis:
+    image: redis:latest
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gateflow
