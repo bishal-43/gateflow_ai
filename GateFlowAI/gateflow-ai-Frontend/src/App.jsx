@@ -19,6 +19,7 @@ import { ToastContainer } from '@/components/ui/Toast'
 // ── Auth ──────────────────────────────────────────────────────────────────────
 import Login from '@/pages/auth/Login'
 import RegisterGuard from '@/pages/auth/RegisterGuard'
+import OAuthCallback from '@/pages/auth/OAuthCallback'
 
 // ── Lazy-loaded pages (code splitting) ───────────────────────────────────────
 const MainDashboard = lazy(() => import('@/pages/dashboard/MainDashboard'))
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register-guard" element={<RegisterGuard />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
 
           {/* ── Organizer / Resident / Admin ── */}
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={ORG_ROLES}><MainDashboard /></ProtectedRoute>} />

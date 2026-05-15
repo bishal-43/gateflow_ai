@@ -62,4 +62,12 @@ ANSWER:"""
         )
     )
 
-    return response.text.strip()
+    # response.text raises ValueError if the response was blocked by safety filters
+    # or if the model returned no candidates — handle gracefully instead of crashing.
+    try:
+        return response.text.strip()
+    except ValueError:
+        return (
+            "I wasn't able to generate an answer for that question. "
+            "Please rephrase or check with the event organizer."
+        )

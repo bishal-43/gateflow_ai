@@ -1,9 +1,12 @@
 """routes/auth_routes.py — Auth endpoints"""
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import controllers.auth_controller as ctrl
+from config import settings
 from database import get_db
 from dependencies import get_current_user
 from models.user import User
@@ -101,6 +104,23 @@ async def google_login():
     return RedirectResponse(url=await ctrl.google_url(), status_code=302)
 
 
-@router.get("/google/callback", response_model=TokenResponse, summary="Google OAuth2 callback — handled automatically")
+@router.get("/google/callback", response_class=RedirectResponse, summary="Google OAuth2 callback — redirects to frontend with tokens")
 async def google_callback(code: str, state: str, db: AsyncSession = Depends(get_db)):
-    return await ctrl.google_login(db, code, state)
+    try:
+        token_data = await ctrl.google_login(db, code, state)
+    except Exception:
+        # On any failure, redirect to login with an error flag
+        return RedirectResponse(
+            url=f"{settings.PUBLIC_APP_URL}/login?error=oauth_failed",
+            status_code=302,
+        )
+
+    params = urlencode({
+        "access_token":  token_data.access_token,
+        "refresh_token": token_data.refresh_token,
+        "role":          token_data.role,
+    })
+    return RedirectResponse(
+        url=f"{settings.PUBLIC_APP_URL}/auth/callback?{params}",
+        status_code=302,
+    )
