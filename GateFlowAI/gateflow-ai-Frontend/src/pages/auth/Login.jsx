@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -37,6 +37,8 @@ const registerSchema = z.object({
 export default function Login() {
   const [mode, setMode] = useState('login') // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false)
+  const [searchParams] = useSearchParams()
+  const oauthError = searchParams.get('error') === 'oauth_failed'
 
   const loginMutation = useLogin()
   const registerMutation = useRegister()
@@ -202,9 +204,11 @@ export default function Login() {
             )}
 
             {/* Server error */}
-            {serverError && (
+            {(serverError || oauthError) && (
               <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400" role="alert">
-                {serverError}
+                {oauthError && !serverError
+                  ? 'Google sign-in failed. Please try again or use email/password.'
+                  : serverError}
               </div>
             )}
 

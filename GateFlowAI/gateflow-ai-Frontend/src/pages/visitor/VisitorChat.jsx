@@ -38,6 +38,10 @@ function friendlyError(status, message) {
   if (status === 401 || status === 403) return { text: 'Invalid invite. Chat access is not available.', fatal: true }
   if (status === 503) return { text: 'The AI assistant is currently unavailable. Please visit the help desk for assistance.', fatal: false }
   if (status === 404) return { text: 'No documents have been uploaded for this space yet. Please check with the organizer.', fatal: false }
+  // Network timeout or no response — the AI call can take up to 30s
+  if (!status || message?.toLowerCase().includes('timeout') || message?.toLowerCase().includes('network')) {
+    return { text: 'The AI assistant is taking longer than expected. Please try again in a moment.', fatal: false }
+  }
   return { text: 'Sorry, I couldn\'t get an answer right now. Please try again.', fatal: false }
 }
 

@@ -32,12 +32,15 @@ export function useRAGHealth() {
  * Backend validates the invite token and derives space_id server-side.
  * Expired / revoked invite → backend returns 400/401 → chat blocked.
  *
+ * Uses a 60-second timeout because the RAG pipeline (Gemini LLM call)
+ * can take 15–25 seconds — well above the default 15s axios timeout.
+ *
  * @returns mutation with mutate({ token, question })
  */
 export function useChatAsk() {
   return useMutation({
     mutationFn: ({ token, question }) =>
-      api.post('/chat/ask', { token, question }).then((r) => r.data),
+      api.post('/chat/ask', { token, question }, { timeout: 60_000 }).then((r) => r.data),
     throwOnError: false,
   })
 }
