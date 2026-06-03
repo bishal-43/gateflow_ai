@@ -3,7 +3,7 @@ services:
   frontend:
     build: ./gateflow-ai-Frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
 
   backend:
     build: ./gateflow-backend
